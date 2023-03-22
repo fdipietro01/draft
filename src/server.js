@@ -2,10 +2,10 @@ const express = require("express");
 const initConection = require("./config/mongo");
 const router = require("./routes/index");
 const handlebars = require("express-handlebars");
-const session = require('express-session')
-const MongoStore = require('connect-mongo')
-const passport = require('passport')
-const initPassport = require('./config/passport')
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const passport = require("passport");
+const initPassport = require("./config/passport");
 
 const app = express();
 initConection();
@@ -19,10 +19,10 @@ app.use(
   session({
     secret: "Secret",
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl:
-      "mongodb+srv://fdipietro01:Mongo01@cluster0.ik4waeo.mongodb.net/ecommerce?retryWrites=true&w=majority",
+        "mongodb+srv://fdipietro01:Mongo01@cluster0.ik4waeo.mongodb.net/ecommerce?retryWrites=true&w=majority",
       mongoOptions: {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -30,24 +30,22 @@ app.use(
       ttl: 15000000000,
     }),
   })
-  );
-  
-  //definir motor de plantillas
-  app.engine("handlebars", handlebars.engine());
+);
+
+//definir motor de plantillas
+app.engine("handlebars", handlebars.engine());
 app.set("views", __dirname + "/views");
 app.set("view engine", "handlebars");
 app.use("/aleas", express.static(__dirname + "/public"));
 
 //passport
-initPassport()
-app.use(passport.initialize())
-app.use(passport.session())
+initPassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(router);
-
 
 app.listen(PORT, (err) => {
   if (err) return err;
   console.log(`Escuchando en el puerto ${PORT}`);
 });
-
