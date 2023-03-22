@@ -9,10 +9,12 @@ const sessionsRouter = Router();
 sessionsRouter.post(
   "/login",
   isLogged,
-  passport.authenticate("login", { failureRedirect: "/failedlogin" }),
+  passport.authenticate("login", {
+    failureRedirect: "/failedlogin",
+    failureMessage: true,
+  }),
   async (req, res) => {
     try {
-      console.log(req.user, "la sessionn");
       if (!req.user) {
         return res.render("sessionAlert", {
           success: false,
@@ -67,7 +69,10 @@ sessionsRouter.post("/relogin", async (req, res) => {
 
 sessionsRouter.post(
   "/register",
-  passport.authenticate("register", { failureRedirect: "/failedregister" }),
+  passport.authenticate("register", {
+    failureRedirect: "/failedregister",
+    failureMessage: true,
+  }),
   async (req, res) => {
     const { nombre, apellido } = req.body;
     res.render("sessionAlert", {

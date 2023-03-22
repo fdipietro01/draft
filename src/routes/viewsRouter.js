@@ -4,8 +4,8 @@ const CartManager = require("../daos/mongoDaos/CartManager");
 const viewsRouter = Router();
 const productHandler = new ProductManager();
 const cartHandler = new CartManager();
-const autentication = require('../middleware/auth')
-const isLogged = require('../middleware/isLogged')
+const autentication = require("../middleware/auth");
+const isLogged = require("../middleware/isLogged");
 
 viewsRouter.get("/login", isLogged, async (req, res) => {
   res.render("login");
@@ -17,27 +17,29 @@ viewsRouter.get("/register", isLogged, async (req, res) => {
   res.render("register");
 });
 
-viewsRouter.get('/failedregister', (req, res)=>{
+viewsRouter.get("/failedregister", (req, res) => {
+  const message = req.session.messages[req.session.messages.length - 1];
   res.render("sessionAlert", {
     success: false,
-    message: "Error al registrarse",
+    message: message,
     case: "Registro",
     url: "/register",
   });
-})
+});
 
-viewsRouter.get('/failedlogin', (req, res)=>{
+viewsRouter.get("/failedlogin", (req, res) => {
+  const message = req.session.messages[req.session.messages.length - 1];
   res.render("sessionAlert", {
     success: false,
-    message: "Error al loguearse",
+    message: message,
     case: "Login",
     url: "/login",
   });
-})
+});
 
 viewsRouter.get("/products", autentication, async (req, res) => {
-  const {nombre, apellido, role} = req.session.user
-  const isAdmin = role === "admin"
+  const { nombre, apellido, role } = req.session.user;
+  const isAdmin = role === "admin";
   try {
     const {
       payload,

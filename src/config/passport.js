@@ -21,7 +21,7 @@ const initPassport = () => {
           //si el usuario existe no tira error, pero con false avisa que ya hay uno registrado
           if (exist) {
             console.log("El usuario existe");
-            return done(null, false);
+            return done(null, false, { message: "Usuario ya registrado" });
           }
           const user = {
             nombre,
@@ -53,17 +53,18 @@ const initPassport = () => {
   passport.use(
     "login",
     new LocalStrategy(
-      { usernameField: "mail" },
+      { usernameField: "email" },
       async (username, password, done) => {
         try {
           const user = await UserModel.findOne({ email: username });
           if (!user) {
-            console.log("Usuario no encontrado");
-            return done(null, false);
+            console.log("Usuario inexistente");
+            return done(null, false, { message: "Usuario inexistente" });
           }
-          if (!isValidPassword(password, user.password))
-            return done(null, false);
-          console.log(!isValidPassword(password, user.password));
+          if (!isValidPassword(password, user.password)) {
+            console.log("Password inválida");
+            return done(null, false, { message: "Password Inválida" });
+          }
           return done(null, user);
         } catch (err) {
           console.log("entro x acá,", err);
