@@ -8,24 +8,29 @@ const sessionsRouter = Router();
 
 sessionsRouter.post(
   "/login",
+  isLogged,
   passport.authenticate("login", { failureRedirect: "/failedlogin" }),
   async (req, res) => {
-    console.log("entro en este middleware");
-    const { mail, pass } = req.body;
-    if (!req.session.user)
-      return res.render("sessionAlert", {
-        success: false,
-        message: "Credenciales Incorrectas",
-        case: "Login",
-        url: "/login",
-      });
-
-    req.session.user = {
-      nombre: user.nombre,
-      apellido: user.apellido,
-      email: user.email,
-    };
-    res.redirect("/products");
+    try {
+      console.log(req.user, "la sessionn");
+      if (!req.user) {
+        return res.render("sessionAlert", {
+          success: false,
+          message: "Credenciales Incorrectas",
+          case: "Login",
+          url: "/login",
+        });
+      }
+      const { nombre, apellido, email } = req.user;
+      req.session.user = {
+        nombre: nombre,
+        apellido: apellido,
+        email: email,
+      };
+      return res.redirect("/products");
+    } catch (err) {
+      console.log(err);
+    }
   }
 );
 
@@ -64,15 +69,12 @@ sessionsRouter.post(
   "/register",
   passport.authenticate("register", { failureRedirect: "/failedregister" }),
   async (req, res) => {
-    console.log("sipi");
-  },
-  async (req, res) => {
-    console.log("llego hasta la ruta");
     const { nombre, apellido } = req.body;
     res.render("sessionAlert", {
       success: true,
       message: `${nombre} ${apellido} te has registrado exitosamente`,
       url: "/login",
+      case: "Login",
     });
   }
 );

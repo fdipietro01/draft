@@ -14,13 +14,15 @@ const initPassport = () => {
         usernameField: "email",
       },
       async (req, username, password, done) => {
-        console.log("ACAAAAAAA");
+        console.log({ username, password });
         const { nombre, apellido, email, usuario } = req.body;
         try {
           const exist = await UserModel.findOne({ email: username });
           //si el usuario existe no tira error, pero con false avisa que ya hay uno registrado
-          if (exist) return done(null, false);
-
+          if (exist) {
+            console.log("El usuario existe");
+            return done(null, false);
+          }
           const user = {
             nombre,
             apellido,
@@ -29,27 +31,22 @@ const initPassport = () => {
             password: createHash(password),
           };
           const newUser = await UserModel.create(user);
-          done(null, newUser);
+          return done(null, newUser);
         } catch (err) {
-          done("Error al obtener el usuario" + err);
+          return done("Error al registrar" + err);
         }
       }
     )
   );
   passport.serializeUser((user, done) => {
-    try {
-      done(user._id);
-    } catch (err) {
-      console.log("error1", err);
-      done(err);
-    }
+    done(null, user._id);
   });
+
   passport.deserializeUser(async (id, done) => {
     try {
       let user = await UserModel.findById(id);
       done(null, user);
     } catch (error) {
-      console.log("errorcito", error);
       done(error);
     }
   });
@@ -60,15 +57,17 @@ const initPassport = () => {
       async (username, password, done) => {
         try {
           const user = await UserModel.findOne({ email: username });
-          if (!user) return done(null, false);
-          console.log("hay usuario");
+          if (!user) {
+            console.log("Usuario no encontrado");
+            return done(null, false);
+          }
           if (!isValidPassword(password, user.password))
             return done(null, false);
-          console.log(31);
+          console.log(!isValidPassword(password, user.password));
           return done(null, user);
         } catch (err) {
           console.log("entro x acá,", err);
-          done(err);
+          return done(err);
         }
       }
     )
